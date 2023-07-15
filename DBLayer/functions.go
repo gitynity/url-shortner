@@ -3,6 +3,7 @@ package dblayer
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"time"
 )
 
@@ -18,36 +19,37 @@ CREATE TABLE urls (
 
 */
 
-type urls struct{
-  original_url string 
-  short_code string
-  created_at *time.Time
-  last_updated_at *time.Time
+type URL struct {
+	Original_url    string
+	Short_code      string
+	Created_at      time.Time
+	Last_updated_at time.Time
 }
 
 //Notice that all members in urls struct are unexported.
 //So they can only be accessed by either methods of urls struct, or in case when the urls object is passed as argument to the function
 
-func InsertURL(db *sql.DB, u *urls) error{
-  r,err:=db.Exec("INSERT INTO urls(original_url,short_code,created_at) values(?,?,?)", u.original_url,u.short_code,u.created_at)
-  if err != nil {
-    return err
-  }
-  count,err:=r.RowsAffected()
-  if count==0{
-    return errors.New("no records inserted")
-  }
-  if err!=nil{
-    return err
-  }
-  return nil
+func InsertURL(db *sql.DB, u *URL) error {
+	r, err := db.Exec("INSERT INTO urls(original_url,short_code,created_at) values(?,?,?)", u.Original_url, u.Short_code, u.Created_at)
+	if err != nil {
+		return err
+	}
+	count, err := r.RowsAffected()
+	if count == 0 {
+		return errors.New("no records inserted")
+	}
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func getShortUrl(db *sql.DB, u *urls) (*urls,error){
-    query:="select short_code from urls where original_url=?"
-    err:=db.QueryRow(query, u.original_url).Scan(u.short_code)
-    if err != nil {
-      return u, err
-    }
-    return u,nil
-}  
+func GetShortUrl(db *sql.DB, u *URL) (*URL, error) {
+	query := "select short_code from urls where original_url=?"
+	err := db.QueryRow(query, u.Original_url).Scan(&u.Short_code)
+	if err != nil {
+		log.Println(err)
+		return u, err
+	}
+	return u, nil
+}
