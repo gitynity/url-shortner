@@ -5,22 +5,22 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func DBconfig()(*sql.DB,error){
-  db,err:=sql.Open("mysql", "localuser:pass@(127.0.0.1:3306)/localdb?parseTime=true")
-  if err != nil {
-    return nil,err  
-  }
-  err=db.Ping()
-  if err!=nil{
-   return nil,err
-  }
-  return db,nil
+func DBconfig() (*sql.DB, error) {
+	db, err := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/urlShortnerDB?parseTime=true")
+	if err != nil {
+		return nil, err
+	}
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
 }
 
 /*
 why would you import go-sql-driver/mysql if you are not going to use it?
 
-The import statement `_ "go-sql-driver/mysql"` is used to import the MySQL driver package in Go, which is required to connect and interact with a MySQL database using the `database/sql` package. 
+The import statement `_ "go-sql-driver/mysql"` is used to import the MySQL driver package in Go, which is required to connect and interact with a MySQL database using the `database/sql` package.
 
 Even though it may seem like the imported package is not directly used in the code snippet you provided, it is still necessary for the proper functioning of the `database/sql` package with MySQL. By importing the package, the MySQL driver is registered with the `database/sql` package, allowing you to use the `sql.Open` function with the `"mysql"` driver name.
 go get mvdan.cc/gofumpt
@@ -41,4 +41,4 @@ Without importing and registering the MySQL driver package, the `database/sql` p
 
 In summary, importing the `go-sql-driver/mysql` package is necessary for the proper functioning of the `database/sql` package with MySQL because it provides the implementation of the `database/sql` interface for MySQL databases, enabling you to connect, query, and interact with a MySQL database using the `database/sql` package's methods and types.
 
-*
+*/

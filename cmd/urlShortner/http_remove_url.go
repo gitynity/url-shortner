@@ -1,13 +1,19 @@
 package main
 
-import "net/http"
+import (
+	"database/sql"
+	"net/http"
+)
 
-type removeUrlHandler struct{}
-func (h *removeUrlHandler) ServeHTTP(w http.ResponseWriter,req *http.Request){
-h.handle(w,req)
+type removeUrlHandler struct {
+	db *sql.DB
 }
 
-func(h *removeUrlHandler) handle(w http.ResponseWriter, req *http.Request){
-  body := []byte{'a'}
-  w.Write(body)
+func (h *removeUrlHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	h.handle(w, req)
+}
+
+func (h *removeUrlHandler) handle(w http.ResponseWriter, req *http.Request) {
+	body := []byte{'a'}
+	w.Write(body)
 }
