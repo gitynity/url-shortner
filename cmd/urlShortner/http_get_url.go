@@ -13,6 +13,7 @@ import (
 type Response struct {
 	ShortUrl string `json:"short_url,omitempty"`
 	Success  bool   `json:"success,omitempty"`
+	Message  string `json:"message,omitempty"`
 }
 
 type getUrlHandler struct {
