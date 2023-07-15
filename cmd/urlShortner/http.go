@@ -19,7 +19,9 @@ func registerHandlers(db *sql.DB) map[string]http.Handler {
 		db: db,
 	}
 	addURL := shortenUrlHandler{
-		db: db,
+		db:             db,
+		InsertURL:      dblayer.InsertURL,
+		CheckUrlExists: dblayer.CheckUrlExists,
 	}
 
 	m := make(map[string]http.Handler)

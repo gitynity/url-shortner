@@ -53,3 +53,16 @@ func GetShortUrl(db *sql.DB, u *URL) (*URL, error) {
 	}
 	return u, nil
 }
+
+func CheckUrlExists(db *sql.DB, u *URL) (*URL, error) {
+	query := "select original_url from urls where original_url=?"
+	err := db.QueryRow(query, u.Original_url).Scan(&u.Original_url)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+		log.Println("i am here", err)
+		return u, err
+	}
+	return u, nil
+}

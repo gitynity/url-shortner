@@ -17,10 +17,12 @@ func main() {
 	}
 	r := mux.NewRouter()
 	handlers := registerHandlers(db)
-	r.Handle("/get-url", handlers["get-url"])
-	r.Handle("/remove-url", handlers["remove-url"])
-	r.Handle("update-url", handlers["update-url"])
-	r.Handle("/add-url", handlers["add-url"])
+
+	r.Handle("/get-url", handlers["get-url"]).Methods(http.MethodGet)
+
+	r.Handle("/remove-url", handlers["remove-url"]).Methods(http.MethodDelete)
+
+	r.Handle("/add-url", handlers["add-url"]).Methods(http.MethodPost)
 
 	err = http.ListenAndServe("localhost:8080", r)
 	if err != nil {
