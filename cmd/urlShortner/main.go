@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"os"
+	cachelayer "url-shortner/CacheLayer"
 	dblayer "url-shortner/DBLayer"
 
 	"github.com/gorilla/mux"
@@ -12,11 +13,16 @@ import (
 func main() {
 	db, err := dblayer.DBconfig()
 	if err != nil {
-		fmt.Println("Getting DB Connection", err)
+		log.Println("Getting DB Connection", err)
+		os.Exit(3)
+	}
+	rdb, err := cachelayer.CacheConfig()
+	if err != nil {
+		log.Println("Getting redis Connection", err)
 		os.Exit(3)
 	}
 	r := mux.NewRouter()
-	handlers := registerHandlers(db)
+	handlers := registerHandlers(db, rdb)
 
 	r.Handle("/get-short-url", handlers["get-short-url"]).Methods(http.MethodGet)
 
@@ -31,5 +37,5 @@ func main() {
 		os.Exit(4)
 	}
 
-	fmt.Println("Server Started")
+	log.Println("Server Started")
 }
