@@ -13,7 +13,7 @@
 - `./bin/url-shortner`
 
 ## Requests:
-- POST: `curl -X POST -i -v 'localhost:8080/add-url?long_url=https://go.dev/play/'`
+- POST: `curl -X POST 'localhost:8080/add-url?long_url=https://go.dev/play/'`
 - GET: `curl -X GET 'localhost:8080/get-long-url?short_code=rJQgckya'`
 - GET: `curl -X GET 'localhost:8080/get-short-url?long_url=https://goplay.tools/'`
-- DELETE: `curl -X DELETE -i -v 'localhost:8080/remove-url?long_url=https://go.dev/play/'`
+- DELETE: `curl -X DELETE 'localhost:8080/remove-url?long_url=https://go.dev/play/'`
