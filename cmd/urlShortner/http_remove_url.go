@@ -1,16 +1,20 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"os"
 	dblayer "url-shortner/DBLayer"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type removeUrlHandler struct {
 	db        *sql.DB
+	rdb       *redis.Client
 	DeleteURL func(db *sql.DB, u *dblayer.URL) error
 }
 
@@ -30,6 +34,7 @@ func (h *removeUrlHandler) parseRequest(req *http.Request) (*dblayer.URL, error)
 	return nativeUrl, nil
 }
 func (h *removeUrlHandler) handle(w http.ResponseWriter, req *http.Request) {
+	ctx := context.Background()
 	httpStatusCode := http.StatusOK
 	url, err := h.parseRequest(req)
 	if err != nil {
@@ -42,7 +47,7 @@ func (h *removeUrlHandler) handle(w http.ResponseWriter, req *http.Request) {
 			os.Exit(5)
 		}
 	}
-
+	h.rdb.Del(ctx, url.Original_url, url.Short_code).Err()
 	err = h.DeleteURL(h.db, url)
 	if err != nil {
 		httpStatusCode = http.StatusFailedDependency
