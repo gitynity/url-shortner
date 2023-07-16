@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -8,10 +9,13 @@ import (
 	"net/http"
 	"os"
 	dblayer "url-shortner/DBLayer"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type getLongUrlHandler struct {
 	db         *sql.DB
+	rdb        *redis.Client
 	getLongUrl func(db *sql.DB, u *dblayer.URL) (*dblayer.URL, error)
 }
 
@@ -32,6 +36,7 @@ func (h *getLongUrlHandler) parseRequest(req *http.Request) (*dblayer.URL, error
 }
 
 func (h *getLongUrlHandler) handle(w http.ResponseWriter, req *http.Request) {
+	ctx := context.Background()
 	httpStatusCode := http.StatusOK
 	url, err := h.parseRequest(req)
 	if err != nil {
@@ -44,6 +49,17 @@ func (h *getLongUrlHandler) handle(w http.ResponseWriter, req *http.Request) {
 			os.Exit(5)
 		}
 	}
+	cacheURL, err := h.rdb.Get(ctx, url.Short_code).Result()
+	if err == nil {
+		w.WriteHeader(httpStatusCode)
+		response := Response{Success: true, ShortUrl: cacheURL, Message: "URL fetched from cache"}
+		json, _ := json.Marshal(response)
+		_, err := w.Write(json)
+		if err != nil {
+			os.Exit(5)
+		}
+		return
+	}
 	longurl, err := h.getLongUrl(h.db, url)
 	if err != nil {
 		log.Printf("%s", err)
@@ -55,7 +71,22 @@ func (h *getLongUrlHandler) handle(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			os.Exit(5)
 		}
+		return
 	}
+	err = h.rdb.Set(ctx, url.Short_code, longurl.Original_url, 0).Err()
+	if err != nil {
+		log.Printf("%s", err)
+		httpStatusCode = http.StatusExpectationFailed
+		w.WriteHeader(httpStatusCode)
+		response := Response{Success: false, Message: "failed to write in cache"}
+		json, _ := json.Marshal(response)
+		_, err := w.Write(json)
+		if err != nil {
+			os.Exit(5)
+		}
+		return
+	}
+
 	w.WriteHeader(httpStatusCode)
 	response := Response{Success: true, LongUrl: longurl.Original_url}
 	json, _ := json.Marshal(response)
