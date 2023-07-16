@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -10,12 +11,15 @@ import (
 	"os"
 	"time"
 	dblayer "url-shortner/DBLayer"
+
+	"github.com/redis/go-redis/v9"
 )
 
 const shortUrlSize = 8
 
 type shortenUrlHandler struct {
 	db             *sql.DB
+	rdb            *redis.Client
 	InsertURL      func(db *sql.DB, u *dblayer.URL) error
 	CheckUrlExists func(db *sql.DB, u *dblayer.URL) (*dblayer.URL, error)
 }
@@ -53,6 +57,7 @@ func (h *shortenUrlHandler) parseRequest(req *http.Request) (*dblayer.URL, error
 	return nativeUrl, nil
 }
 func (h *shortenUrlHandler) handle(w http.ResponseWriter, req *http.Request) {
+	ctx := context.Background()
 	httpStatusCode := http.StatusOK
 	url, err := h.parseRequest(req)
 	if err != nil {
@@ -91,6 +96,19 @@ func (h *shortenUrlHandler) handle(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			os.Exit(5)
 		}
+	}
+	err = h.rdb.Set(ctx, url.Original_url, url.Short_code, 0).Err()
+	if err != nil {
+		log.Printf("%s", err)
+		httpStatusCode = http.StatusExpectationFailed
+		w.WriteHeader(httpStatusCode)
+		response := Response{Success: false, Message: "failed to write in cache"}
+		json, _ := json.Marshal(response)
+		_, err := w.Write(json)
+		if err != nil {
+			os.Exit(5)
+		}
+		return
 	}
 
 	w.WriteHeader(httpStatusCode)
