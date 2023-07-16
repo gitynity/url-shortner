@@ -14,6 +14,6 @@
 
 ## Requests:
 - POST: `curl -X POST -i -v 'localhost:8080/add-url?long_url=https://go.dev/play/'`
-- GET: `curl -i -v 'localhost:8080/get-long-url?short_code=rJQgckya'`
-- GET: `curl -i -v 'localhost:8080/get-short-url?long_url=https://goplay.tools/'`
+- GET: `curl -X GET 'localhost:8080/get-long-url?short_code=rJQgckya'`
+- GET: `curl -X GET 'localhost:8080/get-short-url?long_url=https://goplay.tools/'`
 - DELETE: `curl -X DELETE -i -v 'localhost:8080/remove-url?long_url=https://go.dev/play/'`
