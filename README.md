@@ -4,8 +4,9 @@
 
 ----------------------------------
 ## Dependencies:
-- make sure you have mysql server installed on your machine.
+- make sure you have mysql server and redis server installed on your machine.
 - To install mysql server on mac: `brew install mysql`
+- To install redis server on mac: `brew install redis`
 
 ## Running the server:
 - `git clone https://github.com/gitynity/go-web-Projects.git`
