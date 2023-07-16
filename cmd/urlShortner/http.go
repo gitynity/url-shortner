@@ -4,24 +4,30 @@ import (
 	"database/sql"
 	"net/http"
 	dblayer "url-shortner/DBLayer"
+
+	"github.com/redis/go-redis/v9"
 )
 
-func registerHandlers(db *sql.DB) map[string]http.Handler {
+func registerHandlers(db *sql.DB, cache *redis.Client) map[string]http.Handler {
 
 	getShortURL := getShortUrlHandler{
 		db:          db,
+		rdb:         cache,
 		getShortUrl: dblayer.GetShortUrl,
 	}
 	getLongURL := getLongUrlHandler{
 		db:         db,
+		rdb:        cache,
 		getLongUrl: dblayer.GetLongUrl,
 	}
 	removeURL := removeUrlHandler{
 		db:        db,
+		rdb:       cache,
 		DeleteURL: dblayer.DeleteURL,
 	}
 	addURL := shortenUrlHandler{
 		db:             db,
+		rdb:            cache,
 		InsertURL:      dblayer.InsertURL,
 		CheckUrlExists: dblayer.CheckUrlExists,
 	}
