@@ -1,4 +1,4 @@
-# go-web-Projects.url-shortner
+# url-shortner
 
 <img width="794" alt="Screenshot 2023-07-16 at 5 11 40 AM" src="https://github.com/gitynity/go-web-Projects/assets/23361845/29e0d851-456f-4af5-96fa-4b97c2b72125">
 
