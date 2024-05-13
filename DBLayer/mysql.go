@@ -6,7 +6,7 @@ import (
 )
 
 func DBconfig() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/urlShortnerDB?parseTime=true")
+	db, err := sql.Open("mysql", "root:password@tcp(mysqlDatabase:3306)/urlShortnerDB?parseTime=true")
 	if err != nil {
 		return nil, err
 	}
