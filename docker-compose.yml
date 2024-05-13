@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: my-redis
+    ports:
+      - 6379:6379
+    restart: always
+  
+  mysqlDatabase:
+    image: mysql:latest
+    container_name: my-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password 
+      MYSQL_DATABASE: urlShortnerDB 
+    ports:
+      - 3306:3306
+    restart: always
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my-url-shortner-app
+    restart: always
+    depends_on:
+      - mysqlDatabase 
+      - redis
+    ports:
+      - 8080:8080
+    environment:
+      DB_HOST: "127.0.0.1"  # Use the MySQL container's IP address
+      DB_PORT: "3306"         # MySQL default port
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
